@@ -7,6 +7,7 @@ use std::{fs, path::PathBuf, process};
 
 use config::Config;
 use error::Error;
+use ico_builder::IcoBuilder;
 use icon::Icon;
 use image::Image;
 
@@ -22,6 +23,9 @@ fn main() {
 fn run_pico(config: &Config) -> Result<(), Error> {
     if config.output_path.is_file() && !config.force {
         return Err(Error::OutputExists(config.output_path.clone()));
+    }
+    if config.resolution_sizes[0] > 0 {
+        return png_to_ico(&config);
     }
 
     let paths = expand_paths(&config.input_paths)?;
@@ -75,4 +79,13 @@ fn read_images(paths: Vec<PathBuf>) -> Result<Vec<Image>, Error> {
     }
 
     Ok(images)
+}
+
+fn png_to_ico(config: &Config) -> Result<(), Error> {
+    let index = 0;
+    let selected_path = &config.input_paths[index];
+    let _ = IcoBuilder::default()
+        .add_source_file(&selected_path)
+        .build_file(&config.output_path);
+    Ok(())
 }
