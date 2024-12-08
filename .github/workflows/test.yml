@@ -1,0 +1,99 @@
+# [dzfrias/projectable's ci](https://github.com/dzfrias/projectable/blob/main/.github/workflows/ci.yml)
+# [BurntSushi/ripgrep's ci](https://github.com/BurntSushi/ripgrep/blob/master/.github/workflows/ci.yml)
+
+# code(core): set this github action name as test
+
+name: test
+
+# code(core): let this workflow run when branch main push or pull_request
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  schedule:
+    - cron: "00 01 * * *"
+
+permissions:
+  # to fetch code (actions/checkout)
+  contents: read
+
+env:
+  APP_NAME: rcli
+  RUST_BACKTRACE: 1
+  RUST_LOG: trace
+
+jobs:
+  # code(core): define job test
+  test:
+    name: test
+    # code(core): let it run on strategy.matrix.os
+    # code(core): use os ubuntu-latest, windows-latest,macos-latest
+    strategy:
+      matrix:
+        # os: [ubuntu-latest, windows-latest, macos-latest]
+        include:
+          # - build: linux
+          #   os: ubuntu-latest
+          #   target: x86_64-unknown-linux-musl
+          #   use-cross: true
+
+          # - build: macos
+          #   os: macos-latest
+          #   target: x86_64-apple-darwin
+          #   use-cross: true
+
+          # - build: windows-gnu
+          #   os: windows-latest
+          #   target: x86_64-pc-windows-gnu
+          #   use-cross: false
+
+          - build: windows-msvc
+            os: windows-latest
+            target: x86_64-pc-windows-msvc
+            use-cross: false
+
+          - build: windows32-msvc
+            os: windows-latest
+            target: i686-pc-windows-msvc
+            use-cross: false
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      # code(core): clone -> install rust -> setup cache -> build -> run test
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Rust
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          profile: minimal
+          override: true
+
+      - name: Setup cache
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cargo/bin/
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+            target/
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+
+      - name: Build
+        run: cargo build --verbose --release
+
+      - name: Run tests
+        run: cargo test --verbose
+
+      - name: Publish to crate.io dry-run
+        shell: bash
+        run: |
+          # cargo publish --registry crate --token ${{ env.CARGO_REGISTRY_TOKEN }} --dry-run;
+          cargo publish --token ${{ env.CARGO_REGISTRY_TOKEN }} --dry-run;
+
+        env:
+          # CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_API_KEY }}
+          CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
