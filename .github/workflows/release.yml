@@ -17,7 +17,7 @@ permissions: write-all
 
 jobs:
   #
-  # code(core): define job create-release to creates a release and outputs the url
+  # code(core): define job create-release $ver="1.0.0";to creates a release and outputs the url
   create-release:
     name: create-release
     runs-on: ubuntu-latest
@@ -62,7 +62,7 @@ jobs:
 
     strategy:
       matrix:
-        build: [linux, macos]
+        # build: [linux, macos]
         include:
           # - build: linux
           #   os: ubuntu-latest
