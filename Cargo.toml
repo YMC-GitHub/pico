@@ -1,0 +1,33 @@
+[package]
+name = "pico"
+version = "1.0.0"
+authors = ["Ye MianCheng"]
+edition = "2021"
+description = "A PNG to ICO packer written in Rust."
+repository = "https://github.com/ymc-github/pico/"
+license = "MIT"
+keywords = ["converter", "ico", "png"]
+categories = [
+  "command-line-utilities",
+  "filesystem",
+  "multimedia::encoding",
+  "multimedia::images",
+]
+publish = false
+
+[dependencies]
+clap = { version = "4.4.13", features = ["cargo", "deprecated"] }
+png = "0.17.10"
+ico-builder = "0.1.1"
+# rust-i18n = "3"
+
+[build-dependencies]
+# embed-resource = "2.4"
+winres = "*"
+
+[profile.release]
+codegen-units = 1
+lto = "fat"
+opt-level = 3
+panic = "abort"
+strip = "symbols"
