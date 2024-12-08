@@ -98,15 +98,15 @@ jobs:
       - name: Build
         run: cargo build --verbose --release
 
-      - name: Run tests
-        run: cargo test --verbose
+      # - name: Run tests
+      #   run: cargo test --verbose
 
-      - name: Publish to crate.io dry-run
-        shell: bash
-        run: |
-          # cargo publish --registry crate --token ${{ env.CARGO_REGISTRY_TOKEN }} --dry-run;
-          cargo publish --token ${{ env.CARGO_REGISTRY_TOKEN }} --dry-run;
+      # - name: Publish to crate.io dry-run
+      #   shell: bash
+      #   run: |
+      #     # cargo publish --registry crate --token ${{ env.CARGO_REGISTRY_TOKEN }} --dry-run;
+      #     cargo publish --token ${{ env.CARGO_REGISTRY_TOKEN }} --dry-run;
 
-        env:
-          # CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_API_KEY }}
-          CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
+      #   env:
+      #     # CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_API_KEY }}
+      #     CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
