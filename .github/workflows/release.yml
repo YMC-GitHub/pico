@@ -153,17 +153,17 @@ jobs:
         shell: bash
         if: matrix.os == 'windows-latest'
         run: |
-          certutil -hashfile "$ARCHIVE.exe" SHA256 > "$ARCHIVE.exe.sha256"
-          echo "ASSET=$ARCHIVE.exe" >> $GITHUB_ENV
-          echo "ASSET_SUM=$ARCHIVE.exe.sha256" >> $GITHUB_ENV
+          certutil -hashfile "$ARCHIVE/${{ env.APP_NAME }}.exe" SHA256 > "$ARCHIVE${{ env.APP_NAME }}.exe.sha256"
+          echo "ASSET=$ARCHIVE/${{ env.APP_NAME }}.exe" >> $GITHUB_ENV
+          echo "ASSET_SUM=$ARCHIVE/${{ env.APP_NAME }}.exe.sha256" >> $GITHUB_ENV
 
       - name: Prepare executable file and sha256 file (Unix)
         shell: bash
         if: matrix.os != 'windows-latest'
         run: |
-          shasum -a 256 "$ARCHIVE" > "$ARCHIVE.sha256"
-          echo "ASSET=$ARCHIVE" >> $GITHUB_ENV
-          echo "ASSET_SUM=$ARCHIVE.sha256" >> $GITHUB_ENV
+          shasum -a 256 "$ARCHIVE/${{ env.APP_NAME }}" > "$ARCHIVE/${{ env.APP_NAME }}.sha256"
+          echo "ASSET=$ARCHIVE/${{ env.APP_NAME }}" >> $GITHUB_ENV
+          echo "ASSET_SUM=$ARCHIVE/${{ env.APP_NAME }}.sha256" >> $GITHUB_ENV
 
       - name: Upload release archive
         env:

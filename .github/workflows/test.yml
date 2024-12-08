@@ -7,19 +7,32 @@ name: test
 
 # code(core): let this workflow run when branch main push or pull_request
 on:
-  push:
-    branches: [main]
-  pull_request:
-    branches: [main]
   schedule:
     - cron: "00 01 * * *"
+  # let it able to dispatch manually
+  workflow_dispatch:
+  # let it able to dispatch when push on main
+  push:
+    branches:
+      - main
+    # let it able to when match tag
+    # tags:
+    #   - v[0-9]+.[0-9]+.[0-9]+
+    #   - '*'
+    paths-ignore:
+      - "**/*.md"
+      - LICENSE
+      - "**/*.gitignore"
+      - .editorconfig
+      - docs/**
+      - .github/workflows/release.yml
 
 permissions:
   # to fetch code (actions/checkout)
   contents: read
 
 env:
-  APP_NAME: rcli
+  APP_NAME: pico
   RUST_BACKTRACE: 1
   RUST_LOG: trace
 
