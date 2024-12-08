@@ -121,15 +121,15 @@ jobs:
           version="${{ needs.create-release.outputs.version }}"
           echo "ARCHIVE=${{ env.APP_NAME }}-${version}-${{ matrix.target }}" >> $GITHUB_ENV
 
-      - name: Creating directory for archive
-        shell: bash
-        run: |
-          mkdir -p "$ARCHIVE"
-          if [ "${{ matrix.os }}" = "windows-latest" ]; then
-            mv "target/${{ matrix.target }}/release/${{ env.APP_NAME }}.exe" "$ARCHIVE"
-          else
-            mv "target/${{ matrix.target }}/release/${{ env.APP_NAME }}" "$ARCHIVE"
-          fi
+      # - name: Creating directory for archive
+      #   shell: bash
+      #   run: |
+      #     mkdir -p "$ARCHIVE"
+      #     if [ "${{ matrix.os }}" = "windows-latest" ]; then
+      #       mv "target/${{ matrix.target }}/release/${{ env.APP_NAME }}.exe" "$ARCHIVE"
+      #     else
+      #       mv "target/${{ matrix.target }}/release/${{ env.APP_NAME }}" "$ARCHIVE"
+      #     fi
 
       # - name: Build archive (Windows)
       #   shell: bash
@@ -149,21 +149,31 @@ jobs:
       #     echo "ASSET=$ARCHIVE.tar.gz" >> $GITHUB_ENV
       #     echo "ASSET_SUM=$ARCHIVE.tar.gz.sha256" >> $GITHUB_ENV
 
-      - name: Prepare executable file and sha256 file (Windows)
+      - name: 1.0.0) Creating directory for archive
+        shell: bash
+        run: |
+          mkdir -p "release"
+          if [ "${{ matrix.os }}" = "windows-latest" ]; then
+            mv "target/${{ matrix.target }}/release/${{ env.APP_NAME }}.exe" "release/$ARCHIVE.exe"
+          else
+            mv "target/${{ matrix.target }}/release/${{ env.APP_NAME }}" "release/$ARCHIVE"
+          fi
+
+      - name: 1.0.0) Prepare executable file and sha256 file (Windows)
         shell: bash
         if: matrix.os == 'windows-latest'
         run: |
-          certutil -hashfile "$ARCHIVE/${{ env.APP_NAME }}.exe" SHA256 > "$ARCHIVE/${{ env.APP_NAME }}.exe.sha256"
-          echo "ASSET=$ARCHIVE/${{ env.APP_NAME }}.exe" >> $GITHUB_ENV
-          echo "ASSET_SUM=$ARCHIVE/${{ env.APP_NAME }}.exe.sha256" >> $GITHUB_ENV
+          certutil -hashfile "release/$ARCHIVE.exe" SHA256 > "release/$ARCHIVE.exe.sha256"
+          echo "ASSET=release/$ARCHIVE.exe" >> $GITHUB_ENV
+          echo "ASSET_SUM=release/$ARCHIVE.exe.sha256" >> $GITHUB_ENV
 
-      - name: Prepare executable file and sha256 file (Unix)
+      - name: 1.0.0) Prepare executable file and sha256 file (Unix)
         shell: bash
         if: matrix.os != 'windows-latest'
         run: |
-          shasum -a 256 "$ARCHIVE/${{ env.APP_NAME }}" > "$ARCHIVE/${{ env.APP_NAME }}.sha256"
-          echo "ASSET=$ARCHIVE/${{ env.APP_NAME }}" >> $GITHUB_ENV
-          echo "ASSET_SUM=$ARCHIVE/${{ env.APP_NAME }}.sha256" >> $GITHUB_ENV
+          shasum -a 256 "release/$ARCHIVE" > "release/$ARCHIVE.sha256"
+          echo "ASSET=release/$ARCHIVE" >> $GITHUB_ENV
+          echo "ASSET_SUM=release/$ARCHIVE.sha256" >> $GITHUB_ENV
 
       - name: Upload release archive
         env:
