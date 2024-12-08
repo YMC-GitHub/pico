@@ -53,7 +53,7 @@ jobs:
       - name: Create GitHub release draft
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: gh release create $VERSION --draft --verify-tag --title $VERSION
+        run: gh release create $VERSION --verify-tag --title $VERSION # --draft
 
   # code(core): define job build-and-upload-release
   build-and-upload-release:
@@ -131,23 +131,39 @@ jobs:
             mv "target/${{ matrix.target }}/release/${{ env.APP_NAME }}" "$ARCHIVE"
           fi
 
-      - name: Build archive (Windows)
+      # - name: Build archive (Windows)
+      #   shell: bash
+      #   if: matrix.os == 'windows-latest'
+      #   run: |
+      #     7z a "$ARCHIVE.zip" "$ARCHIVE"
+      #     certutil -hashfile "$ARCHIVE.zip" SHA256 > "$ARCHIVE.zip.sha256"
+      #     echo "ASSET=$ARCHIVE.zip" >> $GITHUB_ENV
+      #     echo "ASSET_SUM=$ARCHIVE.zip.sha256" >> $GITHUB_ENV
+
+      # - name: Build archive (Unix)
+      #   shell: bash
+      #   if: matrix.os != 'windows-latest'
+      #   run: |
+      #     tar czf "$ARCHIVE.tar.gz" "$ARCHIVE"
+      #     shasum -a 256 "$ARCHIVE.tar.gz" > "$ARCHIVE.tar.gz.sha256"
+      #     echo "ASSET=$ARCHIVE.tar.gz" >> $GITHUB_ENV
+      #     echo "ASSET_SUM=$ARCHIVE.tar.gz.sha256" >> $GITHUB_ENV
+
+      - name: Prepare executable file and sha256 file (Windows)
         shell: bash
         if: matrix.os == 'windows-latest'
         run: |
-          7z a "$ARCHIVE.zip" "$ARCHIVE"
-          certutil -hashfile "$ARCHIVE.zip" SHA256 > "$ARCHIVE.zip.sha256"
-          echo "ASSET=$ARCHIVE.zip" >> $GITHUB_ENV
-          echo "ASSET_SUM=$ARCHIVE.zip.sha256" >> $GITHUB_ENV
+          certutil -hashfile "$ARCHIVE.exe" SHA256 > "$ARCHIVE.exe.sha256"
+          echo "ASSET=$ARCHIVE.exe" >> $GITHUB_ENV
+          echo "ASSET_SUM=$ARCHIVE.exe.sha256" >> $GITHUB_ENV
 
-      - name: Build archive (Unix)
+      - name: Prepare executable file and sha256 file (Unix)
         shell: bash
         if: matrix.os != 'windows-latest'
         run: |
-          tar czf "$ARCHIVE.tar.gz" "$ARCHIVE"
-          shasum -a 256 "$ARCHIVE.tar.gz" > "$ARCHIVE.tar.gz.sha256"
-          echo "ASSET=$ARCHIVE.tar.gz" >> $GITHUB_ENV
-          echo "ASSET_SUM=$ARCHIVE.tar.gz.sha256" >> $GITHUB_ENV
+          shasum -a 256 "$ARCHIVE" > "$ARCHIVE.sha256"
+          echo "ASSET=$ARCHIVE" >> $GITHUB_ENV
+          echo "ASSET_SUM=$ARCHIVE.sha256" >> $GITHUB_ENV
 
       - name: Upload release archive
         env:
